@@ -19,7 +19,7 @@ export function onChat(event: mc.ChatEvent) {
 /**
  * beforeChat
  *
- * メッセージを送る前
+ * メッセージを送るとき（送信する直前）
  */
 export function onBeforeChat(event: mc.BeforeChatEvent) {
   // イベントを停止させるか
@@ -29,8 +29,8 @@ export function onBeforeChat(event: mc.BeforeChatEvent) {
   // メッセージが特定のプレイヤーにだけ送られるか(/msg, /t)
   const sendToTargets: boolean = event.sendToTargets;
   // 送信者
-  const sender: mc.Entity = event.sender;
-  // 対象
+  const sender: mc.Player = event.sender;
+  // 対象(送信者は含まれない)
   const targets: mc.Player[] = event.targets;
 
   // メッセージが特定の内容なら

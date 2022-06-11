@@ -1,10 +1,10 @@
 import * as mc from 'mojang-minecraft';
-import { log } from '../utilities';
+import { log, getButtonInstalledLocation, getLeverInstalledLocation } from '../utilities';
 
 /**
  * buttonPush
  *
- * このイベントは、ボタンが押されたときに発火します。
+ * ボタンが押されたとき
  */
 export function onButtonPush(event: mc.ButtonPushEvent) {
   // ボタンのブロック情報
@@ -14,8 +14,18 @@ export function onButtonPush(event: mc.ButtonPushEvent) {
   // ボタンを押したエンティティ
   const user: mc.Entity = event.source;
 
-  const location = `${user.location.x} ${user.location.y} ${user.location.z}`;
-  dimension.runCommand(`summon lightning_bolt ${location}`);
+  // 押したボタンの種類がアカシアなら
+  if (button.id === mc.MinecraftBlockTypes.acaciaButton.id) {
+    // 設置先のブロックを取得する
+    const installedBlock: mc.Block = dimension.getBlock(getButtonInstalledLocation(button));
+    // 設置先のブロックをTNTに変える
+    installedBlock.setType(mc.MinecraftBlockTypes.tnt);
+    // そのままボタンの信号が伝わり着火する
+  } else {
+    // それ以外なら、押したプレイヤーに雷を落とす
+    const location = `${user.location.x} ${user.location.y} ${user.location.z}`;
+    dimension.runCommand(`summon lightning_bolt ${location}`);
+  }
 }
 
 /**
@@ -33,6 +43,11 @@ export function onLeverActivate(event: mc.LeverActionEvent) {
   // イベントを発生させたプレイヤー
   const player: mc.Player = event.player;
 
+  // 設置したブロックをレッドストーンランプにする
+  const installedBlock: mc.Block = dimension.getBlock(getLeverInstalledLocation(lever));
+  installedBlock.setType(mc.MinecraftBlockTypes.redstoneLamp);
+
+  // 有効なら夜に、無効なら昼にする
   if (isPowered) {
     dimension.runCommand('time set midnight');
   } else {
@@ -55,10 +70,23 @@ export function onPistonActivate(event: mc.PistonActivateEvent) {
   // イベントが発生したピストン
   const piston: mc.BlockPistonComponent = event.piston;
 
+  // 粘着ピストン以外なら処理を終了
+  if (block.type !== mc.MinecraftBlockTypes.stickyPiston) {
+    return;
+  }
+
+  // ピストンが影響を与えたブロック位置の一覧
+  const attachedBlocks: mc.BlockLocation[] = piston.attachedBlocks;
   if (isExpanding) {
-    log(`after: true`);
+    // 押し出すときは金ブロックに帰る
+    attachedBlocks.forEach(function (blockLocation) {
+      dimension.getBlock(blockLocation).setType(mc.MinecraftBlockTypes.goldBlock);
+    });
   } else {
-    log(`after: false`);
+    // 引き戻すときはダイヤモンドブロックに変えたいが……消える(?)
+    attachedBlocks.forEach(function (blockLocation) {
+      dimension.getBlock(blockLocation).setType(mc.MinecraftBlockTypes.diamondBlock);
+    });
   }
 }
 
@@ -74,15 +102,29 @@ export function onBeforePistonActivate(event: mc.BeforePistonActivateEvent) {
   const block: mc.Block = event.block;
   // イベントが発生した次元
   const dimension: mc.Dimension = event.dimension;
-  // ピストンが伸びているか
+  // 動作の後にピストンが伸びているか
   const isExpanding: boolean = event.isExpanding;
   // イベントが発生したピストン
   const piston: mc.BlockPistonComponent = event.piston;
 
+  // 通常ピストン以外なら処理を終了
+  if (block.type !== mc.MinecraftBlockTypes.piston) {
+    return;
+  }
+
   if (isExpanding) {
-    log(`before: true`);
-  } else {
-    log(`before: false`);
+    // ピストンが影響を与えるブロック位置の一覧
+    const attachedBlocks: mc.BlockLocation[] = piston.attachedBlocks;
+    attachedBlocks.forEach(function (blockLocation) {
+      const block: mc.Block = dimension.getBlock(blockLocation);
+      if (block.type === mc.MinecraftBlockTypes.obsidian) {
+        // 黒曜石が含まれていると動かない
+        event.cancel = true;
+      } else {
+        // それ以外のブロックはTNTに変える
+        block.setType(mc.MinecraftBlockTypes.tnt);
+      }
+    });
   }
 }
 
