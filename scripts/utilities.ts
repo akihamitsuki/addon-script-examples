@@ -5,17 +5,29 @@ export function log(message: any): void {
   dimesion.runCommand(`say ${message}`);
 }
 
+function trunc(value: number, digit: number = 0) {
+  const base = 10 ** digit;
+  return Math.trunc(value * base) / base;
+}
+
+export function distance(locationA: mc.Location, locationB: mc.Location) {
+  const x = (locationA.x - locationB.x) ** 2;
+  const y = (locationA.y - locationB.y) ** 2;
+  const z = (locationA.z - locationB.z) ** 2;
+  return trunc(Math.sqrt(x + y + z), 2);
+}
+
 /**
  * 座標型から座標の文字列(string)に変換する
  *
  * @param location
  * @returns
  */
-export function toString(location: mc.Location | mc.BlockLocation): string {
+export function toString(location: mc.Location | mc.BlockLocation, digit: number = 0): string {
   // 小数点以下は切り捨て
-  const x = Math.floor(location.x);
-  const y = Math.floor(location.y);
-  const z = Math.floor(location.z);
+  const x = trunc(location.x, digit);
+  const y = trunc(location.y, digit);
+  const z = trunc(location.z, digit);
   // 文字列として返す
   return `${x} ${y} ${z}`;
 }
