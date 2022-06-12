@@ -1,5 +1,5 @@
 import * as mc from 'mojang-minecraft';
-import { distance, log } from '../utilities.js';
+import { getDistance, log, getDistanceFromBlockCenter } from '../utilities.js';
 
 /**
  * projectileHit
@@ -35,7 +35,23 @@ export function projectileHit(event: mc.ProjectileHitEvent) {
     const faceLocX: number = hitBlock.faceLocationX;
     const faceLocY: number = hitBlock.faceLocationY;
 
-    log(`ブロック(${block.type.id}) の ${face}(${faceLocX}, ${faceLocY})面 に当たりました。　`);
+    if (block.id === mc.MinecraftBlockTypes.target.id) {
+      const distance: number = getDistanceFromBlockCenter(faceLocX, faceLocY);
+      log(`ブロック面の中心から ${distance} 離れた場所に当たりました。`);
+
+      let point: number | string = 0;
+      if (distance < 0.1) {
+        point = 10;
+        log(`大当たり! 経験値 +${point}`);
+      } else if (distance < 0.3) {
+        point = 3;
+        log(`当たり! 経験値 +${point}`);
+      } else {
+        point = '-1L';
+        log(`はずれ! レベル -1`);
+      }
+      dimension.runCommand(`xp ${point} ${shooter.nameTag}`);
+    }
   }
 
   // エンティティに当たったとき
@@ -52,7 +68,7 @@ export function projectileHit(event: mc.ProjectileHitEvent) {
       // NOTE: ここでkill()を使うとなぜかマインクラフト本体が落ちる
       // entity.kill();
     } else {
-      log(`頭との距離: ${distance(headLocation, projectileLocation)}ブロック`);
+      log(`頭との距離: ${getDistance(headLocation, projectileLocation)}ブロック`);
     }
   }
 }

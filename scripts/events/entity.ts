@@ -1,22 +1,25 @@
 import * as mc from 'mojang-minecraft';
-import { log, toString } from '../utilities.js';
+import { getDistance, log, toString } from '../utilities.js';
 
 /**
  * entityCreate
  *
- * このイベントは、新しいエンティティが作成されたときに発生します。
+ * 新しいエンティティが作成されたとき（自然スポーンを含む）
  */
 export function onEntityCreate(event: mc.EntityCreateEvent) {
   // イベントを起こしたエンティティ
   const entity: mc.Entity = event.entity;
 
-  log(`${entity.id} が 座標(${toString(entity.location)}) に出現しました。`);
+  if (entity.id === mc.MinecraftEntityTypes.creeper.id) {
+    log(`${entity.id} が 座標(${toString(entity.location)}) に出現しました。`);
+  }
 }
 
 /**
  * entityHit
  *
- * このイベントは、エンティティがヒット（近接攻撃）し、他のエンティティやブロックに影響を与える可能性があるときに発生します。
+ * エンティティが近接攻撃、他のエンティティやブロックに影響を与える可能性があるとき
+ * 遠距離攻撃は projecctileHit
  */
 export function onEntityHit(event: mc.EntityHitEvent) {
   // イベントを起こしたエンティティ
@@ -115,11 +118,9 @@ export function onDeforeDataDrivenEntityTriggerEvent(event: mc.BeforeDataDrivenE
 }
 
 export function registerEntityEvents() {
-  // mc.world.events.entityCreate.subscribe(onEntityCreate);
+  mc.world.events.entityCreate.subscribe(onEntityCreate);
   mc.world.events.entityHit.subscribe(onEntityHit);
   mc.world.events.entityHurt.subscribe(onEntityHurt);
-  // mc.world.events.dataDrivenEntityTriggerEvent.subscribe(onDataDrivenEntityTriggerEvent);
-  // mc.world.events.beforeDataDrivenEntityTriggerEvent.subscribe(
-  //   onDeforeDataDrivenEntityTriggerEvent
-  // );
+  mc.world.events.dataDrivenEntityTriggerEvent.subscribe(onDataDrivenEntityTriggerEvent);
+  mc.world.events.beforeDataDrivenEntityTriggerEvent.subscribe(onDeforeDataDrivenEntityTriggerEvent);
 }

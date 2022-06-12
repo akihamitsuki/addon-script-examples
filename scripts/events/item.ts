@@ -7,7 +7,8 @@ import { log, toString } from '../utilities';
 /**
  * itemUse
  *
- * 特定のアイテムが使用されたとき（アイテムが消費される前に右クリックした時点で発生する）
+ * 特定のアイテムが使用を始めたとき(右クリックした時点で発生)
+ * アイテムが消費されたときではない
  */
 export function onItemUse(event: mc.ItemUseEvent) {
   const item: mc.ItemStack = event.item;
@@ -40,6 +41,8 @@ export function onBeforeItemUse(event: mc.BeforeItemUseEvent) {
  * itemStartUseOn
  *
  * アイテムをブロックに対して使用し始めたとき
+ * ブロックを置くとき
+ * ブロックに影響を与えられるアイテムをつかったとき
  */
 export function onItemStartUseOn(event: mc.ItemStartUseOnEvent) {
   // ブロックを置くときにターゲットにした面
@@ -91,7 +94,7 @@ export function onItemUseOn(event: mc.ItemUseOnEvent) {
   const user: mc.Entity = event.source;
 
   const location = `${toString(blockLocation)}`;
-  log(`itemUseOn: ${user.nameTag} が ${item.id} を ${location} に使用します。`);
+  log(`itemUseOn: ${user.nameTag} が ${item.id} を ${location} に使用しました。`);
 }
 
 /**
@@ -111,7 +114,8 @@ export function onBeforeItemUseOn(event: mc.BeforeItemUseOnEvent) {
   // 使用したエンティティ
   const user: mc.Entity = event.source;
 
-  if (item.id === 'minecraft:dirt') {
+  // 砂はブロックの上にしか置けない
+  if (item.id === 'minecraft:sand' && blockFace !== mc.Direction.up) {
     event.cancel = true;
   } else {
     const location = `${toString(blockLocation)}`;

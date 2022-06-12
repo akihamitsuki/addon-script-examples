@@ -4,7 +4,12 @@ import { log } from '../utilities';
 /**
  * effectAdd
  *
- * このイベントは、エンティティに毒などのエフェクトが追加されたときに発生します。
+ * エンティティにエフェクトが追加されたとき
+ * すでに同じ効果を持っている場合は発生しない
+ *
+ * ハスクから空腹効果をうけたとき
+ * ポーションを飲んだ時
+ * /effectで効果を受けたとき
  */
 export function onEffectAdd(event: mc.EffectAddEvent) {
   // 追加されたエフェクト
@@ -15,7 +20,8 @@ export function onEffectAdd(event: mc.EffectAddEvent) {
   const entity: mc.Entity = event.entity;
 
   log(
-    `${entity.id} が ${effect.displayName}(${effectState}) の効果を 強さ${effect.amplifier} で ${effect.duration}秒間 受けました。`
+    `${entity.id} が ${effect.displayName}(${effectState}) の効果を` +
+      `強さ${effect.amplifier} で ${effect.duration}ティック間 受けました。`
   );
 }
 

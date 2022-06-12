@@ -10,11 +10,31 @@ function trunc(value: number, digit: number = 0) {
   return Math.trunc(value * base) / base;
 }
 
-export function distance(locationA: mc.Location, locationB: mc.Location) {
+/**
+ * 2点間の空間の距離を求める
+ *
+ * @param locationA
+ * @param locationB
+ * @returns
+ */
+export function getDistance(locationA: mc.Location, locationB: mc.Location) {
   const x = (locationA.x - locationB.x) ** 2;
   const y = (locationA.y - locationB.y) ** 2;
   const z = (locationA.z - locationB.z) ** 2;
   return trunc(Math.sqrt(x + y + z), 2);
+}
+
+/**
+ * ブロック面の中心からの距離を求める
+ *
+ * @param faceLocX
+ * @param faceLocY
+ * @returns
+ */
+export function getDistanceFromBlockCenter(faceLocX: number, faceLocY: number) {
+  const x = (faceLocX - 0.5) ** 2;
+  const y = (faceLocY - 0.5) ** 2;
+  return trunc(Math.sqrt(x + y), 2);
 }
 
 /**
@@ -84,9 +104,7 @@ export function getLeverInstalledLocation(lever: mc.Block): mc.BlockLocation {
   // ブロックの状態名を取得する（getProperty内に直接書いてもよい）
   const propertyName: string = mc.BlockProperties.leverDirection;
   // 向きを取得する（文字列のプロパティ型に型変換している）
-  const face: mc.StringBlockProperty = <mc.StringBlockProperty>(
-    permutation.getProperty(propertyName)
-  );
+  const face: mc.StringBlockProperty = <mc.StringBlockProperty>permutation.getProperty(propertyName);
 
   // 元のブロック位置と向きから設置しているブロックを取得する（接地面は向きとは逆になることに注意）
   const blockLocation: mc.BlockLocation = lever.location;

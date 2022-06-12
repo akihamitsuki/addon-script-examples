@@ -3,7 +3,7 @@ import * as mc from 'mojang-minecraft';
 /**
  * explosion
  *
- * このイベントは、爆発が発生したときに発生します。
+ * 爆発が発生したとき
  */
 export function onExplosion(event: mc.ExplosionEvent) {
   // イベントが発生した次元
@@ -28,7 +28,7 @@ export function onExplosion(event: mc.ExplosionEvent) {
 /**
  * beforeExplosion
  *
- * 爆発が起こる前に発生するイベント
+ * 爆発が起こる前
  */
 export function onBeforeExplosion(event: mc.BeforeExplosionEvent) {
   // イベントを停止させるか
