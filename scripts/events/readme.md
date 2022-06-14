@@ -89,10 +89,12 @@
 * `WorldInitializeEvent`: ワールドが初期化したとき
 
 
-## イベントの登録と削除
+## [イベントの登録と削除](./subscribe.ts)
 
 ワールドからイベントシグナルを呼び出して、そこに対応するイベント関数を登録します。
 イベント関数とイベントシグナルは対応している必要があります。
+
+削除する場合は、同じ関数を `unsbscribe()` に指定します。
 
 
 ```typescript
@@ -100,7 +102,7 @@ import * as mc from 'mojang-minecraft';
 
 // イベント関数を作る
 function onBlockBreak(event: mc.BlockBreakEvent) {
-  // 何かする...
+  // ...
 }
 
 // イベント関数を対応するイベントシグナルに登録する: subscribe()
@@ -108,9 +110,17 @@ mc.world.events.blockBreak.subscribe(onBlockBreak);
 
 // イベント関数の登録を解除する: unsubscribe()
 mc.world.events.blockBreak.unsubscribe(onBlockBreak);
+```
 
-// 無名関数として、登録時に関数を記述してもよい
-mc.world.events.blockBreak.subscribe((event: mc.BlockBreakEvent) => {
-  // 何かする...
+### 直接記述する
+
+無名関数の[アロー関数](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Functions/Arrow_functions)を使い、直接`subscribe()`の中に処理を記述することもできます。
+
+ただし、この場合には登録したイベントを削除することは（おそらく）できません。
+
+```typescript
+// この場合eventの型宣言は不要。 subscribe()に記述されている
+mc.world.events.blockBreak.subscribe((event) => {
+  // ...
 });
 
