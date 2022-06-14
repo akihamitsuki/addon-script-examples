@@ -7,24 +7,19 @@ import { log } from '../utilities';
  * ブロックが破壊されたとき
  */
 export function onBlockBreak(event: mc.BlockBreakEvent) {
-  // イベントが発生したブロック
+  // イベントが発生したブロック（壊したあとなので破壊したブロックは取得しない。多くの場合で空気ブロック）
   const block: mc.Block = event.block;
-  // ブロックが破壊される前の順列情報
-  const blockPermutation: mc.BlockPermutation = event.brokenBlockPermutation;
+  // 壊したブロックの種類や状態などについての組み合わせ(permutation)情報
+  const permutation: mc.BlockPermutation = event.brokenBlockPermutation;
   // イベントが発生した次元
   const dimension: mc.Dimension = event.dimension;
   // イベントを発生させたプレイヤー
   const player: mc.Player = event.player;
 
+  // 壊したブロックの位置
   const location = `${dimension.id}(${block.x}, ${block.y}, ${block.z})`;
-  // 破壊された後に発生するのでblockはほぼ空気ブロックになる。
-  log(`${player.nameTag} が ${location} の ${block.id} を破壊しました。`);
 
-  // 元のブロックはblockPermutationの方
-  const propeties: mc.IBlockProperty[] = blockPermutation.getAllProperties();
-  propeties.forEach(function (propety) {
-    log(`${propety.name}`);
-  });
+  log(`${player.nameTag} が ${location} の ${permutation.type.id} を破壊しました。`);
 }
 
 /**
