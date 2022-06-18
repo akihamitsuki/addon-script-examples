@@ -1,4 +1,6 @@
 import * as mc from 'mojang-minecraft';
+import * as mcui from 'mojang-minecraft-ui';
+// event
 import { registerBlockEvents } from './events/block';
 import { registerChargeEvents } from './events/charge';
 import { registerChatEvents } from './events/chat';
@@ -11,6 +13,10 @@ import { registerPlayerEvents } from './events/player';
 import { registerProjectileEvents } from './events/projectile';
 import { registerWorldEvents } from './events/world';
 import { switchEvent } from './events/subscribe';
+// ui
+import { showActionForm } from './ui/action-form';
+import { showMessageForm } from './ui/message-form';
+import { registerModalFormEvents } from './ui/modal-form';
 
 // registerBlockEvents();
 // registerChargeEvents();
@@ -23,5 +29,8 @@ import { switchEvent } from './events/subscribe';
 // registerPlayerEvents();
 // registerProjectileEvents();
 // registerWorldEvents();
+// switchEvent();
 
-switchEvent();
+// mc.world.events.beforeItemUse.subscribe(showActionForm);
+// mc.world.events.beforeItemUse.subscribe(showMessageForm);
+// registerModalFormEvents();
