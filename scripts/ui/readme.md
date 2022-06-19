@@ -19,3 +19,12 @@
 * 数値スライダー (number)
 * テキスト入力 (string)
 * 切り替えボタン (boolean)
+
+
+## [Dynamic Property](./dynamic-property.ts)
+
+送信したフォームの値を保存する。
+
+* number
+* string
+* boolean
