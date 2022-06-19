@@ -17,6 +17,7 @@ import { switchEvent } from './events/subscribe';
 import { showActionForm } from './ui/action-form';
 import { showMessageForm } from './ui/message-form';
 import { registerModalFormEvents } from './ui/modal-form';
+import { registerDynamicPropertyEvents } from './ui/dynamic-property';
 
 // registerBlockEvents();
 // registerChargeEvents();
@@ -34,3 +35,4 @@ import { registerModalFormEvents } from './ui/modal-form';
 // mc.world.events.beforeItemUse.subscribe(showActionForm);
 // mc.world.events.beforeItemUse.subscribe(showMessageForm);
 // registerModalFormEvents();
+registerDynamicPropertyEvents();
