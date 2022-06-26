@@ -35,4 +35,4 @@ import { registerDynamicPropertyEvents } from './ui/dynamic-property';
 // mc.world.events.beforeItemUse.subscribe(showActionForm);
 // mc.world.events.beforeItemUse.subscribe(showMessageForm);
 // registerModalFormEvents();
-registerDynamicPropertyEvents();
+// registerDynamicPropertyEvents();
