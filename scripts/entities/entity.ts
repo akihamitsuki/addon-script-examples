@@ -110,21 +110,23 @@ function teleport(player: mc.Player) {
   player.teleport(location, player.dimension, player.rotation.x, player.rotation.y);
 }
 
-function getClosestEntity(player: mc.Player) {
+function getClosestEntity(player: mc.Player): mc.Entity | undefined {
   // 検索条件
   const query = new mc.EntityQueryOptions();
   // 基準は自分の位置
   query.location = player.location;
-  // 近い順から2つ(1つめは自分なので、2体目が自分から最も近いエンティティ)
-  query.closest = 2;
+  // 自分を除く
+  query.excludeNames = [player.nameTag];
+  // 近い順から1体
+  query.closest = 1;
   // 検索条件をつけてエンティティを取得し、配列で取得する
   const entities = [...player.dimension.getEntities(query)];
-  // 2体以上発見したら
-  if (entities.length > 1) {
-    // 2体目のエンティティを取り出す(0番から始まるので1番が2体目)
-    return entities[1];
+  // 配列内に値があれば
+  if (entities.length) {
+    // 1体目のエンティティを取り出す(配列は0番から始まる)
+    return entities[0];
   }
-
+  // 存在しなければ未定義を返す
   return undefined;
 }
 
