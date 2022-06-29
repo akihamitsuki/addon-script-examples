@@ -248,32 +248,3 @@ function viewVector(player: mc.Player) {
   const vector: mc.Vector = player.viewVector;
   player.runCommand(`say (${vector.x}, ${vector.y}, ${vector.z})`);
 }
-
-/**
- * 向いている方向のブロックを取得する
- */
-function getBlockFromViewVector(player: mc.Player) {
-  const options = new mc.BlockRaycastOptions();
-  options.includeLiquidBlocks = true;
-  options.includePassableBlocks = true;
-  options.maxDistance = 256;
-  const block = player.getBlockFromViewVector(options);
-  player.runCommand(`say ${block.id}`);
-}
-
-/**
- * 向いている方向のエンティティを取得する
- */
-function getEntitiesFromViewVector(player: mc.Player) {
-  const options = new mc.EntityRaycastOptions();
-  options.maxDistance = 256;
-  const entities = player.getEntitiesFromViewVector(options);
-
-  if (entities.length) {
-    for (const entity of entities) {
-      player.runCommand(`say ${entity.id}`);
-    }
-  } else {
-    player.runCommand(`say 見つかりませんでした。`);
-  }
-}

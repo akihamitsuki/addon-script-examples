@@ -70,59 +70,6 @@ function getEntitiesAtBlockLocation() {
 }
 
 /**
- * 光(ray)を投げて(cast)、光の当たったブロック情報を取得する
- */
-function getBlockFromRay(player: mc.Player) {
-  // この地点から
-  // const location = new mc.Location(0, 255, 0);
-  const location = player.location;
-  // この方向に（今回は真下）
-  const direction = new mc.Vector(0, -1, 0);
-
-  // 設定
-  const blockRaycastOptions = new mc.BlockRaycastOptions();
-  // 液体を判定に含むか
-  blockRaycastOptions.includeLiquidBlocks = true;
-  // 光が通過できるブロック（ガラスなど）を判定に含むか
-  blockRaycastOptions.includePassableBlocks = false;
-  // どこまでの距離を判定に含めるか
-  blockRaycastOptions.maxDistance = 256;
-
-  // 以上の情報を使ってブロックを見つける
-  const foundBlock: mc.Block = dimension.getBlockFromRay(location, direction, blockRaycastOptions);
-  player.runCommand(`say 真下のブロックは「${foundBlock.id}」です。`);
-}
-
-/**
- * 光(ray)を投げて(cast)、光の当たったエンティティ情報を取得する
- */
-function getEntitiesFromRay(player: mc.Player) {
-  // この地点から
-  // const location = new mc.Location(0, 255, 0);
-  const location = player.location;
-  // この方向に（今回は真下）
-  const direction = new mc.Vector(0, -1, 0);
-  // 設定
-  const blockRaycastOptions = new mc.BlockRaycastOptions();
-  // 液体を判定に含むか
-  blockRaycastOptions.includeLiquidBlocks = true;
-  // 通過できるブロックを判定に含むか
-  blockRaycastOptions.includePassableBlocks = false;
-  // どこまでを判定に含めるか
-  blockRaycastOptions.maxDistance = 256;
-  // 配列で取得される
-  const dimension = mc.world.getDimension(mc.MinecraftDimensionTypes.overworld);
-  const foundEntities: mc.Entity[] = dimension.getEntitiesFromRay(location, direction);
-  if (foundEntities.length !== 0) {
-    for (let entity of foundEntities) {
-      entity.runCommand(`say ${entity.id}`);
-    }
-  } else {
-    player.runCommand(`say 真下にエンティティは見つかりませんでした。`);
-  }
-}
-
-/**
  * その次元にいるプレイヤーを取得する
  */
 function getPlayers() {
