@@ -50,7 +50,7 @@ function itemComponent() {
   // getComponent()
   // 指定したコンポーネントを取得する
   const component: mc.ItemEnchantsComponent = itemStack.getComponent('minecraft:enchantments');
-  component.enchantments;
+  const enchantmentList = component.enchantments;
 
   // getComponents()
   // すべてのコンポーネントを取得する
