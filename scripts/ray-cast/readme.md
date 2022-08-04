@@ -6,10 +6,10 @@
 * 取得できる対象は「ブロック」と「エンティティ」の2つ
 
 
-|          | Dimension                | Entity                      |
-| -------- | ------------------------ | --------------------------- |
-| Block    | getBlockFromRay()        | getEntitiesFromRay()        |
-| Entities | getBlockFromViewVector() | getEntitiesFromViewVector() |
+|                | get Block                | get Entities                |
+| -------------- | ------------------------ | --------------------------- |
+| from Dimension | getBlockFromRay()        | getEntitiesFromRay()        |
+| from Entity    | getBlockFromViewVector() | getEntitiesFromViewVector() |
 
 
 ## 次元からのレイキャスト
