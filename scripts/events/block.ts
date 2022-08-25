@@ -1,13 +1,14 @@
 import * as mc from 'mojang-minecraft';
-import { log } from '../utilities';
 
 /**
- * blockBreak
+ * BlockBreakEvent
  *
- * ブロックが破壊されたとき
+ * ブロックがプレイヤーに破壊されたとき
+ * https://docs.microsoft.com/en-us/minecraft/creator/scriptapi/mojang-minecraft/blockpermutation
  */
 export function onBlockBreak(event: mc.BlockBreakEvent) {
-  // イベントが発生したブロック（壊したあとなので破壊したブロックは取得しない。多くの場合で空気ブロック）
+  // イベントが発生したブロック
+  // 壊したあとの情報なので破壊したブロックは取得しない。多くの場合で空気ブロック
   const block: mc.Block = event.block;
   // 壊したブロックの種類や状態などについての組み合わせ(permutation)情報
   const permutation: mc.BlockPermutation = event.brokenBlockPermutation;
@@ -16,35 +17,41 @@ export function onBlockBreak(event: mc.BlockBreakEvent) {
   // イベントを発生させたプレイヤー
   const player: mc.Player = event.player;
 
-  // 壊したブロックの位置
+  // イベントが発生したブロックの位置を文字列で取得
   const location = `${dimension.id}(${block.x}, ${block.y}, ${block.z})`;
-
-  log(`${player.nameTag} が ${location} の ${permutation.type.id} を破壊しました。`);
+  // 内容を表示
+  dimension.runCommand(`say ${player.nameTag} が ${location} の ${permutation.type.id} を破壊しました。`);
 }
 
 /**
  * blockExplode
  *
  * ブロックが爆発で破壊されたとき
+ * https://docs.microsoft.com/en-us/minecraft/creator/scriptapi/mojang-minecraft/blockexplodeevent
  */
-export function onBlockExplode(event: mc.BlockExplodeEvent) {
+function onBlockExplode(event: mc.BlockExplodeEvent) {
   // イベントが発生したブロック
+  // 破壊後の情報なので、おそらく空気ブロックになる。
+  // 破壊前のブロック情報はBeforeExplosionEventで取得する
   const block: mc.Block = event.block;
   // イベントが発生した次元
   const dimension: mc.Dimension = event.dimension;
   // 爆発を起こしたエンティティ
   const entity: mc.Entity = event.source;
 
+  // イベントが発生したブロックの位置を文字列で取得
   const location = `${dimension.id}(${block.x}, ${block.y}, ${block.z})`;
-  log(`${entity.id} が ${location} の ${block.id} を爆発で破壊しました。`);
+  // 内容を表示
+  dimension.runCommand(`say ${entity.id} が ${location} のブロックを爆破しました。破壊後は ${block.id} です。`);
 }
 
 /**
  * blockPlace
  *
- * ブロックを置いたとき
+ * プレイヤーがブロックを置いたとき
+ * https://docs.microsoft.com/en-us/minecraft/creator/scriptapi/mojang-minecraft/blockplaceevent
  */
-export function onBlockPlace(event: mc.BlockPlaceEvent) {
+function onBlockPlace(event: mc.BlockPlaceEvent) {
   // イベントが発生したブロック
   const block: mc.Block = event.block;
   // イベントが発生した次元
@@ -52,12 +59,27 @@ export function onBlockPlace(event: mc.BlockPlaceEvent) {
   // イベントを発生させたプレイヤー
   const player: mc.Player = event.player;
 
+  // イベントが発生したブロックの位置を文字列で取得
   const location = `${dimension.id}(${block.x}, ${block.y}, ${block.z})`;
-  log(`${player.nameTag} が ${location} に ${block.id} を置きました。`);
+  // 内容を表示
+  dimension.runCommand(`say ${player.nameTag} が ${location} に ${block.id} を置きました。`);
 }
 
-export function registerBlockEvents() {
-  mc.world.events.blockBreak.subscribe(onBlockBreak);
-  mc.world.events.blockExplode.subscribe(onBlockExplode);
-  mc.world.events.blockPlace.subscribe(onBlockPlace);
+/**
+ * イベントの登録を切り替える
+ *
+ * テスト用
+ *
+ * @param toggle
+ */
+export function toggleBlockEvents(toggle: boolean) {
+  if (toggle) {
+    mc.world.events.blockBreak.subscribe(onBlockBreak);
+    mc.world.events.blockExplode.subscribe(onBlockExplode);
+    mc.world.events.blockPlace.subscribe(onBlockPlace);
+  } else {
+    mc.world.events.blockBreak.unsubscribe(onBlockBreak);
+    mc.world.events.blockExplode.unsubscribe(onBlockExplode);
+    mc.world.events.blockPlace.unsubscribe(onBlockPlace);
+  }
 }
