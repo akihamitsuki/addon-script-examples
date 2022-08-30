@@ -1,44 +1,24 @@
 import * as mc from 'mojang-minecraft';
 import * as mcui from 'mojang-minecraft-ui';
-// event
-import { toggleBlockEvents } from './events/block';
-import { toggleChargeEvents } from './events/charge';
-import { toggleEntityEvents } from './events/entity';
-
-const dynamicProperties = [
-  {
-    name: 'testEvent:toggleBlock',
-    label: 'ブロックイベント',
-    type: 'boolean',
-    default: false,
-  },
-  {
-    name: 'testEvent:toggleEntity',
-    label: 'エンティティイベント',
-    type: 'boolean',
-    default: false,
-  },
-];
+import eventSettings from './eventSettings';
 
 /**
  * ワールド作成時に、プレイヤーエンティティに設定保存用の場所（ダイナミックプロパティ）を作成する
  */
 mc.world.events.worldInitialize.subscribe((event) => {
-  const playerDef = new mc.DynamicPropertiesDefinition();
-  for (const dp of dynamicProperties) {
+  // 定義インスタンスを作成
+  const worldDef = new mc.DynamicPropertiesDefinition();
+  // 設定配列で繰り返して、定義を設定する
+  for (const dp of eventSettings) {
     if (dp.type === 'boolean') {
-      playerDef.defineBoolean(dp.name);
+      worldDef.defineBoolean(dp.name);
     }
   }
-  event.propertyRegistry.registerEntityTypeDynamicProperties(playerDef, mc.MinecraftEntityTypes.player);
-});
-
-/**
- * プレイヤー参加時に初期値を設定する
- */
-mc.world.events.playerJoin.subscribe((event) => {
-  for (const dp of dynamicProperties) {
-    event.player.setDynamicProperty(dp.name, dp.default);
+  // ワールドに追加
+  event.propertyRegistry.registerWorldDynamicProperties(worldDef);
+  // 初期値を設定
+  for (const dp of eventSettings) {
+    mc.world.setDynamicProperty(dp.name, dp.default);
   }
 });
 
@@ -63,8 +43,9 @@ mc.world.events.beforeItemUse.subscribe((event) => {
 
   // 題名を設定
   ModalForm.title('イベントの切り替え');
-  ModalForm.toggle('ブロックイベント', getPlayerDynamicProperty(player, 'testEvent:toggleBlock'));
-  ModalForm.toggle('エンティティイベント', getPlayerDynamicProperty(player, 'testEvent:toggleEntity'));
+  for (const dp of eventSettings) {
+    ModalForm.toggle(dp.label, getWorldDynamicProperty(mc.world, dp.name));
+  }
 
   // モーダルを表示
   ModalForm.show(player).then((response) => {
@@ -72,29 +53,32 @@ mc.world.events.beforeItemUse.subscribe((event) => {
       player.runCommand('say フォームを閉じました');
       return;
     }
-
-    const [toggleBlock, toggleEntity] = response.formValues;
-    toggleBlockEvents(toggleBlock);
-    player.setDynamicProperty('testEvent:toggleBlock', toggleBlock);
-    toggleEntityEvents(toggleEntity);
-    player.setDynamicProperty('testEvent:toggleEntity', toggleEntity);
+    // 設定で繰り返し
+    eventSettings.forEach((dp, index) => {
+      // 設定した順番で入力結果が返ってくる
+      const value = response.formValues[index];
+      // 設定内の関数を入力結果を引数にして実行
+      dp.func(value);
+      // ダイナミックプロパティに入力結果を保存
+      mc.world.setDynamicProperty(dp.name, value);
+    });
 
     player.runCommand(`say 設定を更新しました。`);
   });
 });
 
 /**
- * プレイヤーのダイナミックプロパティから値を取得し、その際に例外処理を加える
+ * ワールドのダイナミックプロパティから値を取得し、その際に例外処理を加える
  *
- * @param player
+ * @param world
  * @param propertyName
  * @returns
  */
-function getPlayerDynamicProperty(player: mc.Player, propertyName: string) {
+function getWorldDynamicProperty(world: mc.World, propertyName: string) {
   try {
-    return <boolean>player.getDynamicProperty(propertyName);
-  } catch {
-    player.runCommand(`say [error] Cound't find ${propertyName}`);
+    return <boolean>world.getDynamicProperty(propertyName);
+  } catch (e) {
+    console.log(`[error] ${e}`);
   }
   return false;
 }
