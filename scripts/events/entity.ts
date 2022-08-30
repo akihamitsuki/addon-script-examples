@@ -39,11 +39,6 @@ function onEntityHit(event: mc.EntityHitEvent) {
   if (victim !== undefined) {
     attacker.dimension.runCommand(`say ${attacker.id} が ${victim.id} に近接攻撃しました。`);
   }
-
-  // 上の両方の情報がなければ
-  if (block === undefined && victim === undefined) {
-    attacker.dimension.runCommand(`say ${attacker.id} の攻撃は誰にも当たりませんでした。`);
-  }
 }
 
 /**
@@ -96,12 +91,12 @@ function onDataDrivenEntityTriggerEvent(event: mc.DataDrivenEntityTriggerEvent) 
     // 追加されるコンポーネントごとに繰り返し
     moddifer.componentGroupsToAdd.forEach(function (component) {
       // そのコンポーネント名を表示
-      entity.dimension.runCommand(`say ${identifier} に　${component}コンポーネント が追加されました。`);
+      entity.dimension.runCommand(`say ${identifier} イベントで ${component}コンポーネント が追加されました。`);
     });
     // 削除されるコンポーネントごとに繰り返し
     moddifer.componentGroupsToRemove.forEach(function (component) {
       // そのコンポーネント名を表示
-      entity.dimension.runCommand(`say ${identifier} の　${component}コンポーネント が削除されました。`);
+      entity.dimension.runCommand(`say ${identifier} イベントで ${component}コンポーネント が削除されました。`);
     });
   });
 }
@@ -123,10 +118,14 @@ function onDeforeDataDrivenEntityTriggerEvent(event: mc.BeforeDataDrivenEntityTr
 
   modiffiers.forEach(function (moddifer) {
     moddifer.componentGroupsToAdd.forEach(function (component) {
-      entity.dimension.runCommand(`say ${identifier} に　${component}コンポーネント が追加されようとしています。`);
+      entity.dimension.runCommand(
+        `say ${identifier} イベントで ${component}コンポーネント が追加されようとしています。`
+      );
     });
     moddifer.componentGroupsToRemove.forEach(function (component) {
-      entity.dimension.runCommand(`say ${identifier} の　${component}コンポーネント が削除されようとしています。`);
+      entity.dimension.runCommand(
+        `say ${identifier} イベントで ${component}コンポーネント が削除されようとしています。`
+      );
     });
   });
 }
