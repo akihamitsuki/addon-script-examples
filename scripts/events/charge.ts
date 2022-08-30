@@ -1,10 +1,14 @@
 import * as mc from 'mojang-minecraft';
 
+// 弓・トライデント・釣り竿・ヤギの角: start, release
+// クロスボウ: start, complete, release
+// stopがどこで使われるのか未確認
+
 /**
  * itemStartCharge
  * チャージできるアイテムのチャージを開始したとき
  *
- * 弓: 使用を開始したとき
+ * 弓・トライデント: 使用を開始したとき
  * クロスボウ: 使用を開始したとき
  *
  * スケルトンやピレジャーなどの弓攻撃では発生しない
@@ -15,7 +19,9 @@ function onItemStartCharge(event: mc.ItemStartChargeEvent) {
   // 使用者
   const user: mc.Entity = event.source;
   // このアイテムのチャージが完了するまでのティック
-  // NOTE: 弓での数値がおかしい気がする
+  // 弓: 72000ティック
+  // クロスボウ: 25ティック
+  // -> 弓はそもそも完了判定無しの扱いなので、大きな数は「完了しない」を意味しているのかも
   const duration: number = event.useDuration;
 
   user.dimension.runCommand(`say ${user.nameTag} が ${item.id} のチャージを開始。完了まで ${duration}ティック。`);
@@ -29,9 +35,9 @@ function onItemStartCharge(event: mc.ItemStartChargeEvent) {
 /**
  * itemStopCharge
  *
- * チャージできるアイテムのチャージを停止したとき
- * 弓: 途中でやめたとき、発射したとき
- * クロスボウ: 途中でやめたとき、最後まで引き絞ったとき
+ * チャージできるアイテムのチャージを停止したとき？
+ * 1.19.21: 弓・クロスボウで確認できなくなった
+ * いずれも完了前にやめた場合 `release` になる
  */
 function onItemStopCharge(event: mc.ItemStopChargeEvent) {
   // チャージに使用したアイテム
@@ -65,6 +71,11 @@ function onItemCompleteCharge(event: mc.ItemCompleteChargeEvent) {
   const duration: number = event.useDuration;
 
   user.dimension.runCommand(`say ${user.nameTag} が ${item.id} のチャージを完了。`);
+  if (item.id === mc.MinecraftItemTypes.bow.id) {
+    user.runCommand(`effect @s levitation 0`);
+  } else if (item.id === mc.MinecraftItemTypes.crossbow.id) {
+    user.runCommand(`effect @s blindness 0`);
+  }
 }
 
 /**
@@ -72,7 +83,7 @@ function onItemCompleteCharge(event: mc.ItemCompleteChargeEvent) {
  *
  * チャージできるアイテムをチャージから解放したとき
  * 弓: 途中でやめたとき、発射したとき
- * クロスボウ: 発射してもこのイベントは発生しない
+ * クロスボウ: 途中でやめたとき
  */
 function onItemReleaseCharge(event: mc.ItemReleaseChargeEvent) {
   // チャージに使用したアイテム
@@ -83,6 +94,11 @@ function onItemReleaseCharge(event: mc.ItemReleaseChargeEvent) {
   const duration: number = event.useDuration;
 
   user.dimension.runCommand(`say ${user.nameTag} が ${item.id} のチャージを解放。`);
+  if (item.id === mc.MinecraftItemTypes.bow.id) {
+    user.runCommand(`effect @s levitation 0`);
+  } else if (item.id === mc.MinecraftItemTypes.crossbow.id) {
+    user.runCommand(`effect @s blindness 0`);
+  }
 }
 
 export function toggleChargeEvents(toggle: boolean) {
