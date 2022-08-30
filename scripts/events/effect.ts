@@ -1,5 +1,4 @@
 import * as mc from 'mojang-minecraft';
-import { log } from '../utilities';
 
 /**
  * effectAdd
@@ -11,7 +10,7 @@ import { log } from '../utilities';
  * ポーションを飲んだ時
  * /effectで効果を受けたとき
  */
-export function onEffectAdd(event: mc.EffectAddEvent) {
+function onEffectAdd(event: mc.EffectAddEvent) {
   // 追加されたエフェクト
   const effect: mc.Effect = event.effect;
   // エフェクト番号
@@ -19,12 +18,16 @@ export function onEffectAdd(event: mc.EffectAddEvent) {
   // 効果を受けたエンティティ
   const entity: mc.Entity = event.entity;
 
-  log(
-    `${entity.id} が ${effect.displayName}(${effectState}) の効果を` +
+  entity.dimension.runCommand(
+    `say ${entity.id} が ${effect.displayName}(${effectState}) の効果を` +
       `強さ${effect.amplifier} で ${effect.duration}ティック間 受けました。`
   );
 }
 
-export function registerEffectEvents() {
-  mc.world.events.effectAdd.subscribe(onEffectAdd);
+export function toggleEffectEvents(toggle: boolean) {
+  if (toggle) {
+    mc.world.events.effectAdd.subscribe(onEffectAdd);
+  } else {
+    mc.world.events.effectAdd.unsubscribe(onEffectAdd);
+  }
 }

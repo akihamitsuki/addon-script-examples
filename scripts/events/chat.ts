@@ -4,24 +4,28 @@ import * as mc from 'mojang-minecraft';
  * chat
  *
  * メッセージを送ったとき
+ * 送信が完了した後に発生するイベント
  */
-export function onChat(event: mc.ChatEvent) {
+function onChat(event: mc.ChatEvent) {
   // 送信されたメッセージ
   const message: string = event.message;
   // メッセージが特定のプレイヤーにだけ送られたか(/msg, /t)
   const sendToTargets: boolean = event.sendToTargets;
   // 送信者
   const sender: mc.Entity = event.sender;
-  // 対象
+  // 送信対象(送信者は含まれない)
   const targets: mc.Player[] = event.targets;
+
+  sender.runCommand('say *** メッセージ送信イベントが発生');
 }
 
 /**
  * beforeChat
  *
- * メッセージを送るとき（送信する直前）
+ * メッセージを送るとき
+ * 送信する直前なので、メッセージの送信を停止することができる
  */
-export function onBeforeChat(event: mc.BeforeChatEvent) {
+function onBeforeChat(event: mc.BeforeChatEvent) {
   // イベントを停止させるか
   event.cancel;
   // これから送信されるメッセージ
@@ -30,7 +34,7 @@ export function onBeforeChat(event: mc.BeforeChatEvent) {
   const sendToTargets: boolean = event.sendToTargets;
   // 送信者
   const sender: mc.Player = event.sender;
-  // 対象(送信者は含まれない)
+  // 送信対象(送信者は含まれない)
   const targets: mc.Player[] = event.targets;
 
   // メッセージが特定の内容なら
@@ -58,7 +62,12 @@ export function onBeforeChat(event: mc.BeforeChatEvent) {
   }
 }
 
-export function registerChatEvents() {
-  mc.world.events.chat.subscribe(onChat);
-  mc.world.events.beforeChat.subscribe(onBeforeChat);
+export function toggleChatEvents(toggle: boolean) {
+  if (toggle) {
+    mc.world.events.chat.subscribe(onChat);
+    mc.world.events.beforeChat.subscribe(onBeforeChat);
+  } else {
+    mc.world.events.chat.unsubscribe(onChat);
+    mc.world.events.beforeChat.unsubscribe(onBeforeChat);
+  }
 }

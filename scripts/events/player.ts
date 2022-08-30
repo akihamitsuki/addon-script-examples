@@ -6,7 +6,7 @@ import { log } from '../utilities';
  *
  * プレイヤーがワールドに参加したとき
  */
-export function onPlayerJoin(event: mc.PlayerJoinEvent) {
+function onPlayerJoin(event: mc.PlayerJoinEvent) {
   // 参加したプレイヤー
   const player: mc.Player = event.player;
 
@@ -18,14 +18,17 @@ export function onPlayerJoin(event: mc.PlayerJoinEvent) {
  *
  * プレイヤーがワールドを退出したとき
  */
-export function onPlayerLeave(event: mc.PlayerLeaveEvent) {
+function onPlayerLeave(event: mc.PlayerLeaveEvent) {
   // 退出したプレイヤーの名前
   const playerName: string = event.playerName;
-
-  log(`${playerName} がワールドから退出しました。`);
 }
 
-export function registerPlayerEvents() {
-  mc.world.events.playerJoin.subscribe(onPlayerJoin);
-  mc.world.events.playerLeave.subscribe(onPlayerLeave);
+export function togglePlayerEvents(toggle: boolean) {
+  if (toggle) {
+    mc.world.events.playerJoin.subscribe(onPlayerJoin);
+    mc.world.events.playerLeave.subscribe(onPlayerLeave);
+  } else {
+    mc.world.events.playerJoin.unsubscribe(onPlayerJoin);
+    mc.world.events.playerLeave.unsubscribe(onPlayerLeave);
+  }
 }

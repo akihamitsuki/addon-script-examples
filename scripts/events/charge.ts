@@ -1,5 +1,4 @@
 import * as mc from 'mojang-minecraft';
-import { log } from '../utilities';
 
 /**
  * itemStartCharge
@@ -10,7 +9,7 @@ import { log } from '../utilities';
  *
  * スケルトンやピレジャーなどの弓攻撃では発生しない
  */
-export function onItemStartCharge(event: mc.ItemStartChargeEvent) {
+function onItemStartCharge(event: mc.ItemStartChargeEvent) {
   // チャージに使用したアイテム
   const item: mc.ItemStack = event.itemStack;
   // 使用者
@@ -19,11 +18,11 @@ export function onItemStartCharge(event: mc.ItemStartChargeEvent) {
   // NOTE: 弓での数値がおかしい気がする
   const duration: number = event.useDuration;
 
-  log(`${user.nameTag} が ${item.id} のチャージを開始。完了まで ${duration}ティック。`);
+  user.dimension.runCommand(`say ${user.nameTag} が ${item.id} のチャージを開始。完了まで ${duration}ティック。`);
   if (item.id === mc.MinecraftItemTypes.bow.id) {
-    user.runCommand(`effect ${user.nameTag} levitation 9999 5 true`);
+    user.runCommand(`effect @s levitation 9999 5 true`);
   } else if (item.id === mc.MinecraftItemTypes.crossbow.id) {
-    user.runCommand(`effect ${user.nameTag} blindness 9999 0 true`);
+    user.runCommand(`effect @s blindness 9999 0 true`);
   }
 }
 
@@ -34,7 +33,7 @@ export function onItemStartCharge(event: mc.ItemStartChargeEvent) {
  * 弓: 途中でやめたとき、発射したとき
  * クロスボウ: 途中でやめたとき、最後まで引き絞ったとき
  */
-export function onItemStopCharge(event: mc.ItemStopChargeEvent) {
+function onItemStopCharge(event: mc.ItemStopChargeEvent) {
   // チャージに使用したアイテム
   const item: mc.ItemStack = event.itemStack;
   // 使用者
@@ -42,11 +41,11 @@ export function onItemStopCharge(event: mc.ItemStopChargeEvent) {
   // このアイテムのチャージが完了するまでのティック
   const duration: number = event.useDuration;
 
-  log(`${user.nameTag} が ${item.id} のチャージを停止`);
+  user.dimension.runCommand(`${user.nameTag} が ${item.id} のチャージを停止`);
   if (item.id === mc.MinecraftItemTypes.bow.id) {
-    user.runCommand(`effect ${user.nameTag} levitation 0`);
+    user.runCommand(`effect @s levitation 0`);
   } else if (item.id === mc.MinecraftItemTypes.crossbow.id) {
-    user.runCommand(`effect ${user.nameTag} blindness 0`);
+    user.runCommand(`effect @s blindness 0`);
   }
 }
 
@@ -57,7 +56,7 @@ export function onItemStopCharge(event: mc.ItemStopChargeEvent) {
  * 弓: 最大まで引き絞っても完了しない
  * クロスボウ: 最後まで引き絞ったとき
  */
-export function onItemCompleteCharge(event: mc.ItemCompleteChargeEvent) {
+function onItemCompleteCharge(event: mc.ItemCompleteChargeEvent) {
   // チャージに使用したアイテム
   const item: mc.ItemStack = event.itemStack;
   // 使用者
@@ -65,7 +64,7 @@ export function onItemCompleteCharge(event: mc.ItemCompleteChargeEvent) {
   // このアイテムのチャージが完了するまでのティック
   const duration: number = event.useDuration;
 
-  log(`${user.nameTag} が ${item.id} のチャージを完了。`);
+  user.dimension.runCommand(`say ${user.nameTag} が ${item.id} のチャージを完了。`);
 }
 
 /**
@@ -75,7 +74,7 @@ export function onItemCompleteCharge(event: mc.ItemCompleteChargeEvent) {
  * 弓: 途中でやめたとき、発射したとき
  * クロスボウ: 発射してもこのイベントは発生しない
  */
-export function onItemReleaseCharge(event: mc.ItemReleaseChargeEvent) {
+function onItemReleaseCharge(event: mc.ItemReleaseChargeEvent) {
   // チャージに使用したアイテム
   const item: mc.ItemStack = event.itemStack;
   // 使用者
@@ -83,12 +82,19 @@ export function onItemReleaseCharge(event: mc.ItemReleaseChargeEvent) {
   // このアイテムのチャージが完了するまでのティック
   const duration: number = event.useDuration;
 
-  log(`${user.nameTag} が ${item.id} のチャージを解放。`);
+  user.dimension.runCommand(`say ${user.nameTag} が ${item.id} のチャージを解放。`);
 }
 
-export function registerChargeEvents() {
-  mc.world.events.itemStartCharge.subscribe(onItemStartCharge);
-  mc.world.events.itemStopCharge.subscribe(onItemStopCharge);
-  mc.world.events.itemCompleteCharge.subscribe(onItemCompleteCharge);
-  mc.world.events.itemReleaseCharge.subscribe(onItemReleaseCharge);
+export function toggleChargeEvents(toggle: boolean) {
+  if (toggle) {
+    mc.world.events.itemStartCharge.subscribe(onItemStartCharge);
+    mc.world.events.itemStopCharge.subscribe(onItemStopCharge);
+    mc.world.events.itemCompleteCharge.subscribe(onItemCompleteCharge);
+    mc.world.events.itemReleaseCharge.subscribe(onItemReleaseCharge);
+  } else {
+    mc.world.events.itemStartCharge.unsubscribe(onItemStartCharge);
+    mc.world.events.itemStopCharge.unsubscribe(onItemStopCharge);
+    mc.world.events.itemCompleteCharge.unsubscribe(onItemCompleteCharge);
+    mc.world.events.itemReleaseCharge.unsubscribe(onItemReleaseCharge);
+  }
 }

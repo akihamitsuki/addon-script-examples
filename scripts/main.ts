@@ -2,13 +2,34 @@ import * as mc from 'mojang-minecraft';
 import * as mcui from 'mojang-minecraft-ui';
 // event
 import { toggleBlockEvents } from './events/block';
+import { toggleChargeEvents } from './events/charge';
+import { toggleEntityEvents } from './events/entity';
+
+const dynamicProperties = [
+  {
+    name: 'testEvent:toggleBlock',
+    label: 'ブロックイベント',
+    type: 'boolean',
+    default: false,
+  },
+  {
+    name: 'testEvent:toggleEntity',
+    label: 'エンティティイベント',
+    type: 'boolean',
+    default: false,
+  },
+];
 
 /**
  * ワールド作成時に、プレイヤーエンティティに設定保存用の場所（ダイナミックプロパティ）を作成する
  */
 mc.world.events.worldInitialize.subscribe((event) => {
   const playerDef = new mc.DynamicPropertiesDefinition();
-  playerDef.defineBoolean('testEvent:toggleBlock');
+  for (const dp of dynamicProperties) {
+    if (dp.type === 'boolean') {
+      playerDef.defineBoolean(dp.name);
+    }
+  }
   event.propertyRegistry.registerEntityTypeDynamicProperties(playerDef, mc.MinecraftEntityTypes.player);
 });
 
@@ -16,7 +37,9 @@ mc.world.events.worldInitialize.subscribe((event) => {
  * プレイヤー参加時に初期値を設定する
  */
 mc.world.events.playerJoin.subscribe((event) => {
-  event.player.setDynamicProperty('testEvent:toggleBlock', false);
+  for (const dp of dynamicProperties) {
+    event.player.setDynamicProperty(dp.name, dp.default);
+  }
 });
 
 /**
@@ -41,6 +64,7 @@ mc.world.events.beforeItemUse.subscribe((event) => {
   // 題名を設定
   ModalForm.title('イベントの切り替え');
   ModalForm.toggle('ブロックイベント', getPlayerDynamicProperty(player, 'testEvent:toggleBlock'));
+  ModalForm.toggle('エンティティイベント', getPlayerDynamicProperty(player, 'testEvent:toggleEntity'));
 
   // モーダルを表示
   ModalForm.show(player).then((response) => {
@@ -49,9 +73,11 @@ mc.world.events.beforeItemUse.subscribe((event) => {
       return;
     }
 
-    const [toggleBlock] = response.formValues;
+    const [toggleBlock, toggleEntity] = response.formValues;
     toggleBlockEvents(toggleBlock);
     player.setDynamicProperty('testEvent:toggleBlock', toggleBlock);
+    toggleEntityEvents(toggleEntity);
+    player.setDynamicProperty('testEvent:toggleEntity', toggleEntity);
 
     player.runCommand(`say 設定を更新しました。`);
   });

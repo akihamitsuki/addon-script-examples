@@ -1,12 +1,12 @@
 import * as mc from 'mojang-minecraft';
-import { getDistance, log, getDistanceFromBlockCenter } from '../utilities.js';
+import { getDistance, getDistanceFromBlockCenter } from '../utilities.js';
 
 /**
  * projectileHit
  *
  * 発射物が何かに当たったとき
  */
-export function projectileHit(event: mc.ProjectileHitEvent) {
+function projectileHit(event: mc.ProjectileHitEvent) {
   // eventから取得できる情報
   // イベントが発生した次元
   const dimension: mc.Dimension = event.dimension;
@@ -37,20 +37,20 @@ export function projectileHit(event: mc.ProjectileHitEvent) {
 
     if (block.id === mc.MinecraftBlockTypes.target.id) {
       const distance: number = getDistanceFromBlockCenter(faceLocX, faceLocY);
-      log(`ブロック面の中心から ${distance} 離れた場所に当たりました。`);
+      dimension.runCommand(`say ブロック面の中心から ${distance} 離れた場所に当たりました。`);
 
       let point: number | string = 0;
       if (distance < 0.1) {
         point = 10;
-        log(`大当たり! 経験値 +${point}`);
+        dimension.runCommand(`say 大当たり! 経験値 +${point}`);
       } else if (distance < 0.3) {
         point = 3;
-        log(`当たり! 経験値 +${point}`);
+        dimension.runCommand(`say 当たり! 経験値 +${point}`);
       } else {
         point = '-1L';
-        log(`はずれ! レベル -1`);
+        dimension.runCommand(`say はずれ! レベル -1`);
       }
-      dimension.runCommand(`xp ${point} ${shooter.nameTag}`);
+      dimension.runCommand(`say xp ${point} ${shooter.nameTag}`);
     }
   }
 
@@ -64,15 +64,19 @@ export function projectileHit(event: mc.ProjectileHitEvent) {
     // これは2点間の距離だけを判定しているので、必ずしも頭に当たっているわけではない
     const isHeadShot: boolean = headLocation.isNear(projectileLocation, 0.7);
     if (isHeadShot) {
-      log(`Head Shot! ${shooter.nameTag} -> ${entity.id}`);
+      dimension.runCommand(`say Head Shot! ${shooter.nameTag} -> ${entity.id}`);
       // NOTE: ここでkill()を使うとなぜかマインクラフト本体が落ちる
       // entity.kill();
     } else {
-      log(`頭との距離: ${getDistance(headLocation, projectileLocation)}ブロック`);
+      dimension.runCommand(`say 頭との距離: ${getDistance(headLocation, projectileLocation)}ブロック`);
     }
   }
 }
 
-export function registerProjectileEvents() {
-  mc.world.events.projectileHit.subscribe(projectileHit);
+export function toggleProjectileEvents(toggle: boolean) {
+  if (toggle) {
+    mc.world.events.projectileHit.subscribe(projectileHit);
+  } else {
+    mc.world.events.projectileHit.unsubscribe(projectileHit);
+  }
 }

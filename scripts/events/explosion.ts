@@ -5,7 +5,7 @@ import * as mc from 'mojang-minecraft';
  *
  * 爆発が発生したとき
  */
-export function onExplosion(event: mc.ExplosionEvent) {
+function onExplosion(event: mc.ExplosionEvent) {
   // イベントが発生した次元
   const dimension: mc.Dimension = event.dimension;
   // 爆発の影響を受けるブロック位置の配列
@@ -30,7 +30,7 @@ export function onExplosion(event: mc.ExplosionEvent) {
  *
  * 爆発が起こる前
  */
-export function onBeforeExplosion(event: mc.BeforeExplosionEvent) {
+function onBeforeExplosion(event: mc.BeforeExplosionEvent) {
   // イベントを停止させるか
   event.cancel;
   // イベントが発生した次元
@@ -52,7 +52,12 @@ export function onBeforeExplosion(event: mc.BeforeExplosionEvent) {
   }
 }
 
-export function registerExplosionEvents() {
-  mc.world.events.explosion.subscribe(onExplosion);
-  mc.world.events.beforeExplosion.subscribe(onBeforeExplosion);
+export function toggleExplosionEvents(toggle: boolean) {
+  if (toggle) {
+    mc.world.events.explosion.subscribe(onExplosion);
+    mc.world.events.beforeExplosion.subscribe(onBeforeExplosion);
+  } else {
+    mc.world.events.explosion.unsubscribe(onExplosion);
+    mc.world.events.beforeExplosion.unsubscribe(onBeforeExplosion);
+  }
 }
