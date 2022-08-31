@@ -37,22 +37,15 @@ function onBeforeChat(event: mc.BeforeChatEvent) {
   // 送信対象(送信者は含まれない)
   const targets: mc.Player[] = event.targets;
 
-  // メッセージが特定の内容なら
-  if (event.message === 'creeper') {
-    // メッセージが届くプレイヤーで繰り返し
-    targets.forEach(function (target) {
-      // 対象プレイヤーの座標を取得し
-      const x = target.location.x;
-      const y = target.location.y;
-      const z = target.location.z;
-      // その位置にクリーパーを呼び出す
-      target.dimension.runCommand(`summon creeper ${x} ${y} ${z}`);
-    });
+  // メッセージが特定を含んでいれば
+  if (event.message.includes('tnt')) {
+    // TNTを呼び出す
+    sender.runCommand(`summon tnt`);
     // メッセージを送信しない
     event.cancel = true;
   }
 
-  // 特定のプレイヤーだけに送信されていれば
+  // 特定のプレイヤーだけに送信されていれば（ひとりではテストできない）
   if (sendToTargets) {
     // メッセージが届くプレイヤーで繰り返し
     targets.forEach(function (target) {
