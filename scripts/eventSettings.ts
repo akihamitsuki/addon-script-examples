@@ -4,6 +4,11 @@ import { toggleChatEvents } from './events/chat';
 import { toggleDeviceEvents } from './events/device';
 import { toggleEffectEvents } from './events/effect';
 import { toggleEntityEvents } from './events/entity';
+import { toggleExplosionEvents } from './events/explosion';
+import { toggleItemEvents } from './events/item';
+import { togglePlayerEvents } from './events/player';
+import { toggleProjectileEvents } from './events/projectile';
+import { toggleWorldEvents } from './events/world';
 
 const eventSettings = [
   {
@@ -47,6 +52,41 @@ const eventSettings = [
     type: 'boolean',
     default: false,
     func: toggleEntityEvents,
+  },
+  {
+    name: 'testEvent:toggleExplosion',
+    label: 'Explosion Events',
+    type: 'boolean',
+    default: false,
+    func: toggleExplosionEvents,
+  },
+  {
+    name: 'testEvent:toggleItem',
+    label: 'Item Events',
+    type: 'boolean',
+    default: false,
+    func: toggleItemEvents,
+  },
+  {
+    name: 'testEvent:togglePlayer',
+    label: 'Player Events',
+    type: 'boolean',
+    default: false,
+    func: togglePlayerEvents,
+  },
+  {
+    name: 'testEvent:toggleProjectile',
+    label: 'Projectile Events',
+    type: 'boolean',
+    default: false,
+    func: toggleProjectileEvents,
+  },
+  {
+    name: 'testEvent:toggleWorld',
+    label: 'World Events',
+    type: 'boolean',
+    default: false,
+    func: toggleWorldEvents,
   },
 ];
 

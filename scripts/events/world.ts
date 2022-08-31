@@ -3,20 +3,22 @@ import * as mc from 'mojang-minecraft';
 const overworld = mc.world.getDimension(mc.MinecraftDimensionTypes.overworld);
 
 /**
- * tick
+ * tickEvent
  *
  * このイベントはtick毎（1秒間に20回）に発生します。
  */
 function tick(event: mc.TickEvent) {
   // このイベントが起きてからのティック数
+  // と、公式ドキュメントにあるが、ワールドが作成されてからのティック数になっている(1.19.21)
   const tick: number = event.currentTick;
   // 前回のティックからの時間
+  // ティックは1秒間に20回起こることになっているが、毎回厳密に0.05秒になるわけではない
+  // 細かい補正するために用いられる
   const delta: number = event.deltaTime;
 
   // (200ティック = 10秒)に1回実行
   if (tick % 200 === 0) {
-    // ティックは1秒間に20回起こることになっているが、毎回厳密に0.05秒になるわけではない
-    overworld.runCommand(`say 前回のティックから ${delta}秒 経過しました。`);
+    overworld.runCommand(`say TickEvent: ${tick} tick`);
   }
 }
 
@@ -34,21 +36,24 @@ function onWeatherChage(event: mc.WeatherChangeEvent) {
   const isLightning: boolean = event.lightning;
 
   // {(雨でない) かつ (雷でない)} ならば 晴れ
-  const isClear = !isRaining && !isLightning;
-
-  if (isClear) {
+  if (!isRaining && !isLightning) {
+    // /weather clear
     overworld.runCommand(`say ${dimensionName} の天候は「晴れ」です。`);
   }
   // 雨だが雷ではない
   else if (isRaining && !isLightning) {
+    // /weather rain
     overworld.runCommand(`say ${dimensionName} の天候は「雨」です。`);
   }
-  // 雨ではないが雷(これは起こらないはず)
+  // 雨ではないが雷
   else if (!isRaining && isLightning) {
+    // コマンドではこの状態は起こせない
+    // 自然に発生する状況があるかは未確認
     overworld.runCommand(`say ${dimensionName} の天候は「雷」です。`);
   }
   // 雨かつ雷
   else if (isRaining && isLightning) {
+    // /weather thunder
     overworld.runCommand(`say ${dimensionName} の天候は「雷雨」です。`);
   }
 }

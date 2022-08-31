@@ -3,6 +3,13 @@ import * as mc from 'mojang-minecraft';
 // item use
 // アイテムを使ったとき
 
+// 1. itemStartUseOn
+// 2. beforeItemUseOn
+// 3. itemUseOn
+// 4. beforeItemUse
+// 5. itemUse
+// 6. itemStopUseOn
+
 /**
  * itemUse
  *
@@ -13,7 +20,7 @@ function onItemUse(event: mc.ItemUseEvent) {
   const item: mc.ItemStack = event.item;
   const user: mc.Entity = event.source;
 
-  user.dimension.runCommand(`itemUse: ${user.nameTag} が ${item.id} を使用しました。`);
+  user.dimension.runCommand(`say itemUse: ${user.nameTag} が ${item.id} を使用しました。`);
 }
 
 /**
@@ -29,7 +36,7 @@ function onBeforeItemUse(event: mc.BeforeItemUseEvent) {
   // イベントを起こしたエンティティ
   const user: mc.Entity = event.source;
 
-  user.dimension.runCommand(`beforeItemUse: ${user.nameTag} が ${item.id} を使用します。`);
+  user.dimension.runCommand(`say beforeItemUse: ${user.nameTag} が ${item.id} を使用します。`);
 }
 
 // item use on
@@ -57,7 +64,9 @@ function onItemStartUseOn(event: mc.ItemStartUseOnEvent) {
 
   const blockLoc = `${blockLocation.x} ${blockLocation.y} ${blockLocation.z}`;
   const buildLoc = `${buildBlockLocation.x} ${buildBlockLocation.y} ${buildBlockLocation.z}`;
-  user.dimension.runCommand(`itemStartUseOn: ${user.nameTag} が ${item.id} を ${blockLoc}(${buildLoc}) に使用します。`);
+  user.dimension.runCommand(
+    `say itemStartUseOn: ${user.nameTag} が ${item.id} を ${blockLoc}(${buildLoc}) に使用します。`
+  );
 }
 
 /**
@@ -74,7 +83,7 @@ function onItemStopUseOn(event: mc.ItemStopUseOnEvent) {
   const user: mc.Entity = event.source;
 
   const location = `${blockLocation.x} ${blockLocation.y} ${blockLocation.z}`;
-  user.dimension.runCommand(`itemStopUseOn: ${user.nameTag} が ${item.id} を ${location} に使用します。`);
+  user.dimension.runCommand(`say itemStopUseOn: ${user.nameTag} が ${item.id} を ${location} に使用します。`);
 }
 
 /**
@@ -95,7 +104,7 @@ function onItemUseOn(event: mc.ItemUseOnEvent) {
   const user: mc.Entity = event.source;
 
   const location = `${blockLocation.x} ${blockLocation.y} ${blockLocation.z}`;
-  user.dimension.runCommand(`itemUseOn: ${user.nameTag} が ${item.id} を ${location} に使用しました。`);
+  user.dimension.runCommand(`say itemUseOn: ${user.nameTag} が ${item.id} を ${location} に使用しました。`);
 }
 
 /**
@@ -116,16 +125,18 @@ function onBeforeItemUseOn(event: mc.BeforeItemUseOnEvent) {
   const user: mc.Entity = event.source;
 
   // 砂はブロックの上にしか置けない
-  if (item.id === 'minecraft:sand' && blockFace !== mc.Direction.up) {
+  if (item.id === mc.MinecraftBlockTypes.sand.id && blockFace !== mc.Direction.up) {
     event.cancel = true;
   } else {
     const location = `${blockLocation.x} ${blockLocation.y} ${blockLocation.z}`;
-    user.dimension.runCommand(`beforeItemUseOn: ${user.nameTag} が ${item.id} を ${location} に使用します。`);
+    user.dimension.runCommand(`say beforeItemUseOn: ${user.nameTag} が ${item.id} を ${location} に使用します。`);
   }
 }
 
 /**
  * itemDefinitionEvent
+ *
+ * 未確認
  *
  * カスタムアイテムの場合、そのアイテムの定義されたコンポーネントの基本セットが変更されたときにこのイベントがトリガされます。
  * このイベントは、カスタムデータ駆動型アイテムの場合のみ発生することに注意してください。
@@ -135,11 +146,13 @@ function onItemDefinitionEvent(event: mc.ItemDefinitionTriggeredEvent) {
   event.item;
   event.source;
 
-  event.source.dimension.runCommand(`itemDefinitionEvent`);
+  event.source.dimension.runCommand(`say itemDefinitionEvent`);
 }
 
 /**
  * beforeItemDefinitionEvent
+ *
+ * 未確認
  *
  * カスタムアイテムの場合、このイベントは、トリガーされたイベントに応じて、アイテムの定義されたコンポーネントのセットが変更される前にトリガーされます。
  * このイベントは、カスタムデータドリブンアイテムに対してのみ発生することに注意してください。
@@ -154,7 +167,7 @@ function onBeforeItemDefinitionEvent(event: mc.BeforeItemDefinitionTriggeredEven
   // イベントを起こしたエンティティ
   event.source;
 
-  event.source.dimension.runCommand(`beforeItemDefinitionEvent`);
+  event.source.dimension.runCommand(`say beforeItemDefinitionEvent`);
 }
 
 /**

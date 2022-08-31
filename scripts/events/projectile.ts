@@ -27,7 +27,7 @@ function projectileHit(event: mc.ProjectileHitEvent) {
 
   // ブロックに当たったとき
   if (hitBlock !== undefined) {
-    // これが当たったブロック
+    // 当たったブロックの情報
     const block: mc.Block = hitBlock.block;
     // 当たった面
     const face: mc.Direction = hitBlock.face;
@@ -35,6 +35,7 @@ function projectileHit(event: mc.ProjectileHitEvent) {
     const faceLocX: number = hitBlock.faceLocationX;
     const faceLocY: number = hitBlock.faceLocationY;
 
+    // ターゲットブロックに当たったとき
     if (block.id === mc.MinecraftBlockTypes.target.id) {
       const distance: number = getDistanceFromBlockCenter(faceLocX, faceLocY);
       dimension.runCommand(`say ブロック面の中心から ${distance} 離れた場所に当たりました。`);
@@ -50,7 +51,7 @@ function projectileHit(event: mc.ProjectileHitEvent) {
         point = '-1L';
         dimension.runCommand(`say はずれ! レベル -1`);
       }
-      dimension.runCommand(`say xp ${point} ${shooter.nameTag}`);
+      dimension.runCommand(`xp ${point} ${shooter.nameTag}`);
     }
   }
 
@@ -65,8 +66,8 @@ function projectileHit(event: mc.ProjectileHitEvent) {
     const isHeadShot: boolean = headLocation.isNear(projectileLocation, 0.7);
     if (isHeadShot) {
       dimension.runCommand(`say Head Shot! ${shooter.nameTag} -> ${entity.id}`);
-      // NOTE: ここでkill()を使うとなぜかマインクラフト本体が落ちる
-      // entity.kill();
+      // エンティティを倒す（残りHPを無視して）
+      entity.kill();
     } else {
       dimension.runCommand(`say 頭との距離: ${getDistance(headLocation, projectileLocation)}ブロック`);
     }

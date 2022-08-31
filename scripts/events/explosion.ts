@@ -13,13 +13,14 @@ function onExplosion(event: mc.ExplosionEvent) {
   // 爆発した(する)エンティティ
   const explodeEntity: mc.Entity = event.source;
 
-  // 爆発したエンティティがTNTなら
-  if (explodeEntity.id === 'minecraft:creeper') {
+  // 爆発したエンティティがクリーパーなら
+  if (explodeEntity.id === mc.MinecraftEntityTypes.creeper.id) {
     // 影響を受けるブロックでループ
     blockLocations.forEach(function (blockLocation) {
       // 対象ブロックを変更
-      // 壊れるブロックなので、変更後のブロックが壊れることになる
-      dimension.getBlock(blockLocation).setType(mc.MinecraftBlockTypes.obsidian);
+      // 壊れることが確定したブロックなので、変更後のブロックが壊れることになる
+      // 例え岩盤でもアイテム化する
+      dimension.getBlock(blockLocation).setType(mc.MinecraftBlockTypes.bedrock);
     });
     // 爆発後なのでcancelはできない
   }
@@ -41,13 +42,13 @@ function onBeforeExplosion(event: mc.BeforeExplosionEvent) {
   const explodeEntity: mc.Entity = event.source;
 
   // 爆発したエンティティがTNTなら
-  if (explodeEntity.id === 'minecraft:tnt') {
+  if (explodeEntity.id === mc.MinecraftEntityTypes.tnt.id) {
     // 影響を受けるブロックでループ
     blockLocations.forEach(function (blockLocation) {
       // 対象ブロックを変更
       dimension.getBlock(blockLocation).setType(mc.MinecraftBlockTypes.goldBlock);
     });
-    // 真にすると爆発させない
+    // 真にすると爆発させない -> ブロックの変更だけをして終わる
     event.cancel = true;
   }
 }

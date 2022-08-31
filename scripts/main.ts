@@ -1,6 +1,10 @@
 import * as mc from 'mojang-minecraft';
 import * as mcui from 'mojang-minecraft-ui';
 import eventSettings from './eventSettings';
+import { onPlayerJoin } from './events/player';
+
+/** 設定用アイテムを渡す */
+mc.world.events.playerJoin.subscribe(onPlayerJoin);
 
 /**
  * ワールド作成時に、プレイヤーエンティティに設定保存用の場所（ダイナミックプロパティ）を作成する
