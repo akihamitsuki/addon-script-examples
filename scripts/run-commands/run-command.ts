@@ -3,46 +3,60 @@ import * as mc from 'mojang-minecraft';
 /**
  * エンティティのメソッドからコマンドを実行した場合は、`@s`がそのエンティティになる
  */
-export function runCommandByEntity() {
-  const dimension = mc.world.getDimension(mc.MinecraftDimensionTypes.overworld);
-  const entities = dimension.getEntities();
-  for (const entity of entities) {
+export function runCommandByEntity(event: mc.BeforeChatEvent) {
+  if (event.message === 'byentity') {
     try {
       // execute @e ~ ~ ~ summon lightning_bolt
-      entity.runCommand('summon lightning_bolt');
-      entity.runCommand(`say success`);
-    } catch {
-      entity.runCommand(`say error`);
+      event.sender.runCommand('summon lightning_bolt');
+      // 上のコマンドが成功したらこれが表示される
+      event.sender.runCommand(`say success`);
+    } catch (error) {
+      // もし失敗したらこちらが表示される
+      event.sender.runCommand(`say error: ${error}`);
     }
+
+    event.cancel = true;
   }
 }
 
 /**
  * 次元のメソッドから実行した場合、`@s`は無効
  */
-export function runCommandByDimension() {
-  const dimension = mc.world.getDimension(mc.MinecraftDimensionTypes.overworld);
-  try {
-    dimension.runCommand(`give @s apple`);
-    dimension.runCommand(`say success`);
-  } catch {
-    dimension.runCommand(`say error`);
+export function runCommandByDimension(event: mc.BeforeChatEvent) {
+  if (event.message === 'bydimension') {
+    try {
+      event.sender.dimension.runCommand(`give @s apple`);
+      // 上のコマンドが成功したらこれが表示されるはず
+      event.sender.dimension.runCommand(`say success`);
+    } catch (error) {
+      // 実際はこちらが表示される
+      event.sender.dimension.runCommand(`say error: ${error}`);
+      // -> {"statuCode": -2147352576, "statusMessage": "セレクターに合う対象がありません"}
+    }
+
+    event.cancel = true;
   }
 }
 
 /**
  * コマンド結果を受け取る
  */
-export function result(player: mc.Player) {
-  try {
-    // コマンドの結果をJSON構造のオブジェクトで受け取れる
-    const result = player.runCommand('effect @s levitation 3 1 true');
-    // 内容をすべて表示。中に何が入っているかはコマンドにより異なる
-    player.runCommand(`say ${JSON.stringify(result)}`);
-    // JSON構造なので、オブジェクトとして内容を取り出して使うことができる
-    player.runCommand(`say ${result.statusMessage}`);
-  } catch {
-    player.runCommand(`say error`);
+export function runCommandResult(event: mc.BeforeChatEvent) {
+  if (event.message === 'commandresult') {
+    try {
+      // コマンドの結果をJSON構造のオブジェクトで受け取れる
+      const result = event.sender.runCommand('effect @s levitation 3 1 true');
+      // 内容をすべて表示。中に何が入っているかはコマンドにより異なる
+      event.sender.runCommand(`say ${JSON.stringify(result)}`);
+      // JSON構造なので、オブジェクトとして内容を取り出して使うことができる
+      event.sender.runCommand(`say ${result.statusMessage}`);
+      // -> {"amplifier": 1, "effect": "levitation", "player": ["Steve"], "seconds": 3, "statusCode": 0, "statusMessage" "Steveに浮遊*1を3秒間与えました"}
+      event.sender.runCommand(`say 強さ:${result['amplifier']}, 秒数:${result['seconds']}`);
+    } catch (error) {
+      event.sender.runCommand(`say error ${error}`);
+    }
+
+    event.cancel = true;
   }
 }
 
@@ -90,5 +104,17 @@ export function tooManyCommands(player: mc.Player) {
         // dimension.getBlock(target).setType(mc.MinecraftBlockTypes.air);
       }
     }
+  }
+}
+
+export function toggleRunCommandTests(toggle: boolean) {
+  if (toggle) {
+    mc.world.events.beforeChat.subscribe(runCommandByEntity);
+    mc.world.events.beforeChat.subscribe(runCommandByDimension);
+    mc.world.events.beforeChat.subscribe(runCommandResult);
+  } else {
+    mc.world.events.beforeChat.unsubscribe(runCommandByEntity);
+    mc.world.events.beforeChat.unsubscribe(runCommandByDimension);
+    mc.world.events.beforeChat.unsubscribe(runCommandResult);
   }
 }

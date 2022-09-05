@@ -9,6 +9,7 @@ import { toggleItemEvents } from './events/item';
 import { togglePlayerEvents } from './events/player';
 import { toggleProjectileEvents } from './events/projectile';
 import { toggleWorldEvents } from './events/world';
+import { toggleRunCommandTests } from './run-commands/run-command';
 
 const eventSettings = [
   {
@@ -87,6 +88,13 @@ const eventSettings = [
     type: 'boolean',
     default: false,
     func: toggleWorldEvents,
+  },
+  {
+    name: 'testEvent:toggleRunCommand',
+    label: 'RunCommand',
+    type: 'boolean',
+    default: false,
+    func: toggleRunCommandTests,
   },
 ];
 
